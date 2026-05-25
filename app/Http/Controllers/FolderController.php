@@ -56,7 +56,7 @@ class FolderController extends Controller
         
         foreach ($files as $file) {
             Storage::disk('public')->delete($file->file_path);
-            $file->delete(); // Hapus data file dari database
+            $file->delete();
         }
 
         $folder->delete();
