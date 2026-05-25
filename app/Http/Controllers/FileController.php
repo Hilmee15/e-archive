@@ -15,24 +15,23 @@ class FileController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'upload' => 'required|file|max:10240', 
+            'file' => 'required|file|max:51200', // max 50MB (51200 KB)
             'folder_id' => 'nullable|exists:folders,id'
         ]);
 
-        $uploadedFile = $request->file('upload');
+        $uploadedFile = $request->file('file'); 
         
-        // Securely store the file in storage/app/archives
-        $path = $uploadedFile->store('archives', 'local');
+        $path = $uploadedFile->store('user_files', 'public');
 
         File::create([
-            'user_id' => Auth::id(),
-            'folder_id' => $request->folder_id,
             'name' => $uploadedFile->getClientOriginalName(),
             'file_path' => $path,
-            'file_size' => $uploadedFile->getSize(),
+            'folder_id' => $request->folder_id,
+            'user_id' => Auth::id(),
+            'file_size' => $uploadedFile->getSize(), 
         ]);
 
-        return back()->with('success', 'File uploaded successfully!');
+        return back()->with('success', 'File berhasil diunggah!');
     }
 
     /**

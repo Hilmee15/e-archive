@@ -6,6 +6,7 @@ use App\Models\Folder;
 use App\Models\File;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class FolderController extends Controller
 {
@@ -43,5 +44,23 @@ class FolderController extends Controller
         ]);
 
         return back()->with('success', 'Folder created successfully!');
+    }
+
+    public function destroy(Folder $folder)
+    {
+        if ($folder->user_id !== Auth::id()) {
+            abort(403, 'Unauthorized action.');
+        }
+
+        $files = File::where('folder_id', $folder->id)->get();
+        
+        foreach ($files as $file) {
+            Storage::disk('public')->delete($file->file_path);
+            $file->delete(); // Hapus data file dari database
+        }
+
+        $folder->delete();
+
+        return redirect()->route('drive.index')->with('success', 'Folder deleted successfully!');
     }
 }

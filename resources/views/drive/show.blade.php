@@ -18,6 +18,20 @@
         </div>
     @endif
 
+    <!-- Error Message -->
+    @if ($errors->any())
+        <div class="mb-6 bg-red-50 border-l-4 border-red-500 p-4 rounded shadow-sm">
+            <div class="flex items-center text-red-800 font-bold mb-2">
+                <span class="mr-2">⚠️</span> Terjadi Kesalahan:
+            </div>
+            <ul class="list-disc ml-6 text-sm text-red-700">
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
+
     <!-- Floating Action Bar -->
     <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 mb-8 flex flex-col md:flex-row gap-4 justify-between items-center">
         
@@ -37,7 +51,7 @@
             @csrf
             <!-- Hidden input for file upload -->
             <input type="hidden" name="folder_id" value="{{ $folder->id }}">
-            <input type="file" name="upload" required class="flex-1 text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 transition cursor-pointer">
+            <input type="file" name="file" required class="flex-1 text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 transition cursor-pointer">
             <button type="submit" class="bg-emerald-500 hover:bg-emerald-600 text-white font-medium py-2 px-5 rounded-lg transition shadow-md hover:shadow-lg">
                 Upload File
             </button>
@@ -49,12 +63,22 @@
         <h3 class="text-sm font-bold text-gray-500 uppercase tracking-wider mb-4">Folders</h3>
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-10">
             @foreach($folders as $f)
-                <a href="{{ route('folders.show', $f->id) }}" class="group bg-gradient-to-br from-indigo-500 to-purple-600 p-5 rounded-2xl shadow-md hover:shadow-xl transform hover:-translate-y-1 transition duration-200 flex items-center space-x-4">
-                    <div class="bg-white/20 p-3 rounded-xl text-white">
-                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path></svg>
-                    </div>
-                    <span class="font-semibold text-white truncate text-lg group-hover:text-indigo-50 transition">{{ $f->name }}</span>
-                </a>
+                <div class="group relative bg-gradient-to-br from-indigo-500 to-purple-600 p-5 rounded-2xl shadow-md hover:shadow-xl transform hover:-translate-y-1 transition duration-200 flex justify-between items-center">
+                    <a href="{{ route('folders.show', $f->id) }}" class="flex items-center space-x-4 flex-1">
+                        <div class="bg-white/20 p-3 rounded-xl text-white">
+                            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path></svg>
+                        </div>
+                        <span class="font-semibold text-white truncate text-lg group-hover:text-indigo-50 transition">{{ $f->name }}</span>
+                    </a>
+
+                    <form action="{{ route('folders.destroy', $f->id) }}" method="POST" onsubmit="return confirm('Delete This Folder?');" class="ml-2 z-10">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="p-2 bg-white/20 hover:bg-red-500 rounded-lg text-white/70 hover:text-white transition shadow-sm" title="Delete Folder">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                        </button>
+                    </form>
+                </div>
             @endforeach
         </div>
     @endif
@@ -64,12 +88,25 @@
     @if($files->count() > 0)
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             @foreach($files as $file)
-                <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 hover:border-indigo-300 hover:shadow-lg transform hover:-translate-y-1 transition duration-200 flex flex-col justify-between h-40">
+                <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 hover:border-indigo-300 hover:shadow-lg transform hover:-translate-y-1 transition duration-200 flex flex-col justify-between h-full">
                     
+                    @php
+                        $ekstensiGambar = ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.svg'];
+                        $isImage = \Illuminate\Support\Str::endsWith(strtolower($file->file_path), $ekstensiGambar);
+                    @endphp
+
                     <div class="flex items-start space-x-3 mb-2">
-                        <div class="bg-blue-50 text-blue-500 p-2 rounded-lg">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
-                        </div>
+                        @if($isImage)
+                            <div class="w-24 h-24 flex-shrink-0">
+                                <a href="{{ asset('storage/' . $file->file_path) }}" target="_blank" title="Lihat ukuran penuh">
+                                    <img src="{{ asset('storage/' . $file->file_path) }}" alt="{{ $file->name }}" class="w-full h-full object-cover rounded-lg border border-gray-200 shadow-sm hover:opacity-75 hover:scale-105 transform transition duration-200 cursor-pointer">
+                                </a>
+                            </div>
+                        @else
+                            <div class="bg-blue-50 text-blue-500 p-2 rounded-lg flex-shrink-0">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
+                            </div>
+                        @endif
                         <span class="font-medium text-gray-700 leading-tight line-clamp-2 mt-1" title="{{ $file->name }}">{{ $file->name }}</span>
                     </div>
                     

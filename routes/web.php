@@ -35,6 +35,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/drive', [FolderController::class, 'index'])->name('drive.index');
     Route::get('/folders/{folder}', [FolderController::class, 'show'])->name('folders.show');
     Route::post('/folders', [FolderController::class, 'store'])->name('folders.store');
+    Route::delete('/folders/{folder}', [FolderController::class, 'destroy'])->name('folders.destroy');
 
     // File Routes
     Route::post('/files', [FileController::class, 'store'])->name('files.store');
