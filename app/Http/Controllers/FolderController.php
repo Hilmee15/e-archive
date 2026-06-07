@@ -46,6 +46,23 @@ class FolderController extends Controller
         return back()->with('success', 'Folder created successfully!');
     }
 
+    public function update(Request $request, Folder $folder)
+    {
+        if ($folder->user_id !== Auth::id()) {
+            abort(403, 'Unauthorized action.');
+        }
+
+        $request->validate([
+            'name' => 'required|string|max:255',
+        ]);
+
+        $folder->update([
+            'name' => $request->name,
+        ]);
+
+        return back()->with('success', 'Nama folder berhasil diubah!');
+    }
+
     public function destroy(Folder $folder)
     {
         if ($folder->user_id !== Auth::id()) {
