@@ -71,14 +71,25 @@
                         <span class="font-semibold text-white truncate text-lg group-hover:text-indigo-50 transition">{{ $f->name }}</span>
                     </a>
 
-                    <form action="{{ route('folders.destroy', $f->id) }}" method="POST" onsubmit="return confirm('Delete This Folder?');" class="ml-2 z-10">
-                        @csrf
-                        @method('DELETE')
-                        <button type="submit" class="p-2 bg-white/20 hover:bg-red-500 rounded-lg text-white/70 hover:text-white transition shadow-sm" title="Delete Folder">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                    <div class="ml-2 z-10 flex flex-col space-y-1">
+                        <button type="button" onclick="renameFolder({{ $f->id }}, '{{ addslashes($f->name) }}')" class="p-1.5 bg-white/20 hover:bg-yellow-500 rounded-lg text-white/70 hover:text-white transition shadow-sm" title="Rename Folder">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
                         </button>
-                    </form>
-                </div>
+
+                        <form action="{{ route('folders.destroy', $f->id) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus folder ini beserta isinya?');">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="p-1.5 bg-white/20 hover:bg-red-500 rounded-lg text-white/70 hover:text-white transition shadow-sm" title="Delete Folder">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                            </button>
+                        </form>
+
+                        <form id="rename-form-{{ $f->id }}" action="{{ route('folders.update', $f->id) }}" method="POST" class="hidden">
+                            @csrf
+                            @method('PATCH')
+                            <input type="hidden" name="name" id="rename-input-{{ $f->id }}">
+                        </form>
+                    </div>
             @endforeach
         </div>
     @endif
@@ -134,4 +145,18 @@
             No files found in {{ $folder->name }}.
         </div>
     @endif
+
+    <script>
+        function renameFolder(folderId, currentName) {
+            // Memunculkan kotak dialog bawaan browser
+            let newName = prompt("Masukkan nama baru untuk folder:", currentName);
+            
+            // Mengecek apakah user mengisi nama baru (tidak cancel dan tidak kosong)
+            if (newName !== null && newName.trim() !== "" && newName !== currentName) {
+                // Masukkan nama baru ke form tersembunyi lalu submit
+                document.getElementById('rename-input-' + folderId).value = newName.trim();
+                document.getElementById('rename-form-' + folderId).submit();
+            }
+        }
+    </script>    
 </x-app-layout>

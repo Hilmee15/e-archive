@@ -33,17 +33,11 @@ class FileController extends Controller
 
     public function download(File $file)
     {
-        if ($file->user_id !== Auth::id()) {
-            abort(403, 'Unauthorized access.');
+        if (!Storage::disk('public')->exists($file->file_path)) {
+            abort(404, 'File tidak ditemukan di server.');
         }
-
-        $absolutePath = storage_path('app/' . $file->file_path);
-
-        if (!file_exists($absolutePath)) {
-            abort(404, 'File not found on server.');
-        }
-
-        return response()->download($absolutePath, $file->name);
+        
+        return Storage::disk('public')->download($file->file_path, $file->name);
     }
     
     public function destroy(File $file)
