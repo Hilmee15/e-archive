@@ -136,12 +136,9 @@
 
     <script>
         function renameFolder(folderId, currentName) {
-            // Memunculkan kotak dialog bawaan browser
             let newName = prompt("Masukkan nama baru untuk folder:", currentName);
             
-            // Mengecek apakah user mengisi nama baru (tidak cancel dan tidak kosong)
             if (newName !== null && newName.trim() !== "" && newName !== currentName) {
-                // Masukkan nama baru ke form tersembunyi lalu submit
                 document.getElementById('rename-input-' + folderId).value = newName.trim();
                 document.getElementById('rename-form-' + folderId).submit();
             }
