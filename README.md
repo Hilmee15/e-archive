@@ -25,24 +25,39 @@ Pastikan komputer Anda sudah terinstal:
 Buka terminal/command prompt di dalam folder project, lalu jalankan perintah ini untuk mengunduh semua *dependency* Laravel:
 ```bash
 composer install
+```
 
 ### 3. Install Library Frontend
+```bash
 npm install
+```
 
 ### 4. Configure .env
+```bash
 cp .env.example .env
+```
 
 ### 5. Generate Application Key
+```bash
 php artisan key:generate
+```
 
 ### 6. Migrate Database
+```bash
 php artisan migrate
+```
 
 ### 7. Create Symlink
+```bash
 php artisan storage:link
+```
 
 ### 8. Build Frontend Assets
+```bash
 npm run build
+```
 
 ### 9. Run server
+```bash
 php artisan serve
+```
